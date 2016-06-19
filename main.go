@@ -24,8 +24,16 @@ func check(err error) {
 	}
 }
 
-func rootHandler(w http.ResponseWriter, r *http.Request) {
-	fmt.Fprintf(w, "welcome")
+func boardList() {
+	db, err := sql.Open("mysql", "chan:test@/chan?charset=utf8")
+	rows, err := db.Query("SELECT uri, title FROM boards")
+	check(err)
+
+	for rows.Next() {
+		var uri, title string
+		err = rows.Scan(&uri, &title)
+		check(err)
+	}
 
 }
 func boardHandler(w http.ResponseWriter, r *http.Request) {
@@ -67,7 +75,8 @@ func newPost(w http.ResponseWriter, r *http.Request) {
 func main() {
 	r := mux.NewRouter()
 	r.HandleFunc("/", rootHandler)
-	r.HandleFunc("/new", newPost)
+	r.HandleFunc("/{board}/new", newThread)
+	r.HandleFunc("/{board}/{threadID}/new", newPost)
 	r.HandleFunc("/{board}", boardHandler)
 	r.HandleFunc("/{board}/{threadId}", threadHandler)
 	r.HandleFunc("/{board}/{threadId}/{output}", apiHandler)

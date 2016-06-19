@@ -7,4 +7,7 @@ CREATE TABLE IF NOT EXISTS `boards` (
 );
 INSERT INTO `boards` VALUES
 ('b', 'Random', NULL);
+INSERT INTO `boards` VALUES
+('a', 'Anime', NULL);
+
 
