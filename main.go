@@ -3,6 +3,7 @@ package main
 import (
 	"database/sql"
 	"fmt"
+	"html"
 	"log"
 	"net/http"
 
@@ -15,9 +16,14 @@ const (
 )
 
 func setup() {
-	db, err := sql.Open("mysql", "astaxie:astaxie@/test?charset=utf8")
 
 }
+func check(err error) {
+	if err != nil {
+		fmt.Println(err)
+	}
+}
+
 func rootHandler(w http.ResponseWriter, r *http.Request) {
 	fmt.Fprintf(w, "welcome")
 
@@ -25,7 +31,15 @@ func rootHandler(w http.ResponseWriter, r *http.Request) {
 func boardHandler(w http.ResponseWriter, r *http.Request) {
 	vars := mux.Vars(r)
 	board := vars["board"]
-	fmt.Fprintf(w, board)
+	db, err := sql.Open("mysql", "chan:test@/chan?charset=utf8")
+	check(err)
+	var uri string
+	err = db.QueryRow("select uri from boards where uri = ?", html.EscapeString(board)).Scan(&uri)
+	if err == sql.ErrNoRows {
+		fmt.Fprintf(w, "Error no board")
+	} else {
+		fmt.Println(uri)
+	}
 
 }
 func threadHandler(w http.ResponseWriter, r *http.Request) {
@@ -54,11 +68,10 @@ func main() {
 	r := mux.NewRouter()
 	r.HandleFunc("/", rootHandler)
 	r.HandleFunc("/new", newPost)
-	/*	r.HandleFunc("/{board}", boardHandler)
-		r.HandleFunc("/{board}/{threadId}", threadHandler)
-		r.HandleFunc("/{board}/{threadId}/{output}", apiHandler)
-		r.HandleFunc("/{board}/{threadId}/{output}", apiHandler) */
-	//	http.Handle("/", r)
+	r.HandleFunc("/{board}", boardHandler)
+	r.HandleFunc("/{board}/{threadId}", threadHandler)
+	r.HandleFunc("/{board}/{threadId}/{output}", apiHandler)
+	r.HandleFunc("/{board}/{threadId}/{output}", apiHandler)
 	err := http.ListenAndServe(PORT, r)
 	if err != nil {
 		log.Fatal(err)
