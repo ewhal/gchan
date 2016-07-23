@@ -27,13 +27,16 @@ func rootHandler(w http.ResponseWriter, r *http.Request) {
 
 }
 
+func saveHandler(w http.ResponseWriter, r *http.Request) {
+
+}
+
 func main() {
 	file, err := os.Open("config.json")
 	if err != nil {
 		panic(err)
 	}
 	decoder := json.NewDecoder(file)
-	configuration := Configuration{}
 	err = decoder.Decode(&configuration)
 	if err != nil {
 		panic(err)
@@ -45,6 +48,7 @@ func main() {
 
 	// basic handlers
 	router.HandleFunc("/", rootHandler)
+	router.HandleFunc("/save", saveHandler)
 	// ListenAndServe on PORT with router
 	err = http.ListenAndServe(configuration.Port, router)
 	if err != nil {
