@@ -48,7 +48,8 @@ func main() {
 
 	// basic handlers
 	router.HandleFunc("/", rootHandler)
-	router.HandleFunc("/save", saveHandler)
+	router.HandleFunc("/thread/{ID}", rootHandler)
+	router.HandleFunc("/new", saveHandler)
 	// ListenAndServe on PORT with router
 	err = http.ListenAndServe(configuration.Port, router)
 	if err != nil {
