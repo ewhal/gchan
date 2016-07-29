@@ -24,7 +24,8 @@ type Configuration struct {
 }
 
 func rootHandler(w http.ResponseWriter, r *http.Request) {
-
+	vars := mux.Vars(r)
+	appnumber := vars["appnumber"]
 }
 
 func saveHandler(w http.ResponseWriter, r *http.Request) {
