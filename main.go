@@ -27,8 +27,17 @@ func rootHandler(w http.ResponseWriter, r *http.Request) {
 	vars := mux.Vars(r)
 	appnumber := vars["appnumber"]
 }
+func boardHandler(w http.ResponseWriter, r *http.Request) {
+	vars := mux.Vars(r)
+	appnumber := vars["appnumber"]
+}
 
-func saveHandler(w http.ResponseWriter, r *http.Request) {
+func threadHandler(w http.ResponseWriter, r *http.Request) {
+	vars := mux.Vars(r)
+	appnumber := vars["appnumber"]
+}
+
+func newHandler(w http.ResponseWriter, r *http.Request) {
 
 }
 
@@ -49,12 +58,12 @@ func main() {
 
 	// basic handlers
 	router.HandleFunc("/", rootHandler)
-	router.HandleFunc("/{BOARD}", rootHandler)
+	router.HandleFunc("/{BOARD}", boardHandler)
 	router.HandleFunc("/{BOARD}/thread/{ID}", rootHandler)
-	router.HandleFunc("/thread/{ID}", Handler)
-	router.HandleFunc("/{BOARD}/page/{ID}", pageHandler)
-	router.HandleFunc("/img/{ID}", rootHandler)
-	router.HandleFunc("/new", saveHandler)
+	router.HandleFunc("/thread/{ID}", threadHandler)
+	router.HandleFunc("/{BOARD}/page/{ID}", boardHandler)
+	router.HandleFunc("/img/{ID}", tHandler)
+	router.HandleFunc("/new", newHandler)
 	// ListenAndServe on PORT with router
 	err = http.ListenAndServe(configuration.Port, router)
 	if err != nil {
