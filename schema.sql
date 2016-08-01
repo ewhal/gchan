@@ -10,6 +10,7 @@ CREATE TABLE `boards` (
 CREATE TABLE `threads` (
   `id` int(10) unsigned NOT NULL auto_increment,
   `board` longtext,
+  `threadnum` int(20),
   `title` longtext,
   `name` longtext,
   `email` longtext,
@@ -23,7 +24,9 @@ CREATE TABLE `threads` (
 CREATE TABLE `posts` (
   `id` int(10) unsigned NOT NULL auto_increment,
   `board` longtext,
+  `postnum` int(20),
   `title` longtext,
+  `thread` longtext,
   `name` longtext,
   `email` longtext,
   `usermode` longtext,

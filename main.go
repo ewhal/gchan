@@ -4,6 +4,7 @@ import (
 	"database/sql"
 	"encoding/json"
 	"fmt"
+	"html"
 	"log"
 	"net/http"
 	"os"
@@ -27,6 +28,29 @@ type Configuration struct {
 	Name string
 }
 
+type Board struct {
+	Board       string `json:"board"`
+	Title       string `json:"title"`
+	Subtitle    string `json:"subtitle"`
+	Description string `json:"description"`
+}
+
+type Thread struct {
+	ID       int    `json:"id"`
+	Board    string `json:"board"`
+	Title    string `json:"title"`
+	Name     string `json:"name"`
+	Email    string `json:"email"`
+	Usermode string `json:"usermode"`
+	Post     string `json:"post"`
+	Files    string `json:"files"`
+	Created  string `json:"created"`
+}
+
+type Threads struct {
+	Threads []Thread `json:"threads"`
+}
+
 // checkErr function for error handling
 func checkErr(err error) {
 	if err != nil {
@@ -42,16 +66,43 @@ func rootHandler(w http.ResponseWriter, r *http.Request) {
 	defer db.Close()
 	query, err := db.Query("select board from boards")
 	for query.Next() {
-		var title string
-		query.Scan(&title)
-		fmt.Printf(title)
+		var board string
+		query.Scan(&board)
+		fmt.Printf(board)
 
 	}
 
 }
 func boardHandler(w http.ResponseWriter, r *http.Request) {
-	//vars := mux.Vars(r)
-	//appnumber := vars["appnumber"]
+	vars := mux.Vars(r)
+	board := vars["BOARD"]
+	// open db connection
+	db, err := sql.Open("mysql", DATABASE)
+	checkErr(err)
+
+	defer db.Close()
+	query, err := db.Query("select title, subtitle, description from boards where board=?", html.EscapeString(board))
+	checkErr(err)
+	for query.Next() {
+		var title, subtitle, description string
+		query.Scan(&title, &subtitle, &description)
+
+		fmt.Printf(board)
+		fmt.Printf(title)
+		fmt.Printf(subtitle)
+		fmt.Printf(description)
+	}
+	stmt, err := db.Query("select * from threads where board=?", html.EscapeString(board))
+	checkErr(err)
+
+	b := Threads{Threads: []Thread{}}
+	for stmt.Next() {
+		p := Thread{}
+		stmt.Scan(&p.ID, &p.Board, &p.Title, &p.Name, &p.Email, &p.Usermode, &p.Post, &p.Files, &p.Created)
+		b.Threads = append(b.Threads, p)
+
+	}
+
 }
 
 func threadHandler(w http.ResponseWriter, r *http.Request) {
@@ -80,7 +131,7 @@ func main() {
 
 	// basic handlers
 	router.HandleFunc("/", rootHandler)
-	router.HandleFunc("/{BOARD}", boardHandler)
+	router.HandleFunc("/{BOARD}/", boardHandler)
 	router.HandleFunc("/{BOARD}/thread/{ID}", rootHandler)
 	router.HandleFunc("/thread/{ID}", threadHandler)
 	router.HandleFunc("/{BOARD}/page/{ID}", boardHandler)
