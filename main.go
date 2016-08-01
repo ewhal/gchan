@@ -5,6 +5,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"html"
+	"html/template"
 	"log"
 	"net/http"
 	"os"
@@ -16,6 +17,7 @@ import (
 
 var DATABASE string
 var configuration Configuration
+var templates = template.Must(template.ParseFiles("templates/index.html", "templates/board.html", "templates/thread.html"))
 
 type Configuration struct {
 	// PORT for golang to listen on
@@ -48,7 +50,11 @@ type Thread struct {
 }
 
 type Threads struct {
+	Boards  []Board  `json:"boards"`
 	Threads []Thread `json:"threads"`
+}
+type Boards struct {
+	Boards []Board `json:"boards"`
 }
 
 // checkErr function for error handling
@@ -64,12 +70,17 @@ func rootHandler(w http.ResponseWriter, r *http.Request) {
 	checkErr(err)
 
 	defer db.Close()
+	b := Boards{Boards: []Board{}}
 	query, err := db.Query("select board from boards")
 	for query.Next() {
-		var board string
-		query.Scan(&board)
-		fmt.Printf(board)
+		p := Board{}
+		query.Scan(&p.Board)
+		b.Boards = append(b.Boards, p)
 
+	}
+	err = templates.ExecuteTemplate(w, "index.html", &b)
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
 	}
 
 }
@@ -106,8 +117,11 @@ func boardHandler(w http.ResponseWriter, r *http.Request) {
 }
 
 func threadHandler(w http.ResponseWriter, r *http.Request) {
-	//vars := mux.Vars(r)
-	//appnumber := vars["appnumber"]
+	/*
+		vars := mux.Vars(r)
+		board := vars["BOARD"]
+		thread := vars["THREAD"]
+	*/
 }
 
 func newHandler(w http.ResponseWriter, r *http.Request) {
