@@ -3,6 +3,7 @@ package main
 import (
 	"database/sql"
 	"encoding/json"
+	"fmt"
 	"html"
 	"html/template"
 	"log"
@@ -39,7 +40,7 @@ type Board struct {
 type Thread struct {
 	ID        int    `json:"id"`
 	Board     string `json:"board"`
-	Threadnum string `json:"threadnum"`
+	Threadnum int    `json:"threadnum"`
 	Title     string `json:"title"`
 	Name      string `json:"name"`
 	Email     string `json:"email"`
@@ -48,10 +49,28 @@ type Thread struct {
 	Files     string `json:"files"`
 	Created   string `json:"created"`
 }
+type Post struct {
+	ID       int    `json:"id"`
+	Board    string `json:"board"`
+	Postnum  int    `json:"postnum"`
+	Thread   int    `json:"thread"`
+	Title    string `json:"title"`
+	Name     string `json:"name"`
+	Email    string `json:"email"`
+	Usermode string `json:"usermode"`
+	Post     string `json:"post"`
+	Files    string `json:"files"`
+	Created  string `json:"created"`
+}
 
 type Threads struct {
 	Boards  []Board  `json:"boards"`
 	Threads []Thread `json:"threads"`
+}
+type Posts struct {
+	Boards  []Board  `json:"boards"`
+	Threads []Thread `json:"threads"`
+	Posts   []Post   `json:"posts"`
 }
 type Boards struct {
 	Boards []Board `json:"boards"`
@@ -92,7 +111,7 @@ func boardHandler(w http.ResponseWriter, r *http.Request) {
 	checkErr(err)
 
 	defer db.Close()
-	b := Threads{Boards: []Board{}, Threads: []Thread{}}
+	b := Posts{Boards: []Board{}, Threads: []Thread{}, Posts: []Post{}}
 	query, err := db.Query("select board, title, subtitle, description from boards where board=?", html.EscapeString(board))
 	checkErr(err)
 	for query.Next() {
@@ -111,7 +130,7 @@ func boardHandler(w http.ResponseWriter, r *http.Request) {
 
 	}
 
-	err = templates.ExecuteTemplate(w, "thread.html", &b)
+	err = templates.ExecuteTemplate(w, "board.html", &b)
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 	}
@@ -119,11 +138,46 @@ func boardHandler(w http.ResponseWriter, r *http.Request) {
 }
 
 func threadHandler(w http.ResponseWriter, r *http.Request) {
-	/*
-		vars := mux.Vars(r)
-		board := vars["BOARD"]
-		thread := vars["THREAD"]
-	*/
+	vars := mux.Vars(r)
+	board := vars["BOARD"]
+	thread := vars["ID"]
+
+	db, err := sql.Open("mysql", DATABASE)
+	checkErr(err)
+
+	defer db.Close()
+	b := Posts{Boards: []Board{}, Threads: []Thread{}, Posts: []Post{}}
+	query, err := db.Query("select board, title, subtitle, description from boards where board=?", html.EscapeString(board))
+	checkErr(err)
+	for query.Next() {
+		p := Board{}
+		query.Scan(&p.Board, &p.Title, &p.Subtitle, &p.Description)
+		b.Boards = append(b.Boards, p)
+
+	}
+	stmt, err := db.Query("select id, board, threadnum, title, name, email, usermode, post, files, created from threads where board=? LIMIT 1", html.EscapeString(board))
+	checkErr(err)
+
+	for stmt.Next() {
+		p := Thread{}
+		stmt.Scan(&p.ID, &p.Board, &p.Threadnum, &p.Title, &p.Name, &p.Email, &p.Usermode, &p.Post, &p.Files, &p.Created)
+		b.Threads = append(b.Threads, p)
+
+	}
+	sm, err := db.Query("select id, board, postnum, thread, title, name, email, usermode, post, files, created from posts where board=? and thread=?", html.EscapeString(board), html.EscapeString(thread))
+	fmt.Println(thread)
+	checkErr(err)
+
+	for sm.Next() {
+		p := Post{}
+		sm.Scan(&p.ID, &p.Board, &p.Postnum, &p.Thread, &p.Title, &p.Name, &p.Email, &p.Usermode, &p.Post, &p.Files, &p.Created)
+		b.Posts = append(b.Posts, p)
+
+	}
+	err = templates.ExecuteTemplate(w, "thread.html", &b)
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+	}
 }
 
 func newHandler(w http.ResponseWriter, r *http.Request) {
@@ -147,12 +201,16 @@ func main() {
 
 	// basic handlers
 	router.HandleFunc("/", rootHandler)
+	router.HandleFunc("/{BOARD}", boardHandler)
 	router.HandleFunc("/{BOARD}/", boardHandler)
-	router.HandleFunc("/{BOARD}/thread/{ID}", rootHandler)
-	router.HandleFunc("/thread/{ID}", threadHandler)
-	router.HandleFunc("/{BOARD}/page/{ID}", boardHandler)
+	router.HandleFunc("/{BOARD}/thread/{ID}", threadHandler)
+	//	router.HandleFunc("/{BOARD}/page/{ID}", boardHandler)
 	router.HandleFunc("/img/{ID}", threadHandler)
 	router.HandleFunc("/new", newHandler)
+	//	router.HandleFunc("/mod", modHandler)
+	//	router.HandleFunc("/login", loginHandler)
+	//	router.HandleFunc("/register", registerHandler)
+
 	// ListenAndServe on PORT with router
 	err = http.ListenAndServe(configuration.Port, router)
 	if err != nil {

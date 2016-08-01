@@ -26,7 +26,7 @@ CREATE TABLE `posts` (
   `board` longtext,
   `postnum` int(20),
   `title` longtext,
-  `thread` longtext,
+  `thread` int(20),
   `name` longtext,
   `email` longtext,
   `usermode` longtext,
