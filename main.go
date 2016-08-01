@@ -65,10 +65,12 @@ type Post struct {
 
 type Threads struct {
 	Boards  []Board  `json:"boards"`
+	Board   Board    `json:"board"`
 	Threads []Thread `json:"threads"`
 }
 type Posts struct {
 	Boards  []Board  `json:"boards"`
+	Board   Board    `json:"board"`
 	Threads []Thread `json:"threads"`
 	Posts   []Post   `json:"posts"`
 }
