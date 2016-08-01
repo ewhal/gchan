@@ -1,3 +1,10 @@
+{{ range .Boards}}
+	{{.Board}}
+	{{.Title}}
+	{{.Subtitle}}
+	{{.Description}}
+{{end}}
+
 {{range .Threads}}
 
 	{{.ID}}
@@ -7,10 +14,11 @@
 	{{.Name}}
 	{{.Email}}
 	{{.Post}}
-	{{.File}}
+	{{.Files}}
 	{{.Created}}
 {{end}}
-{{range .Post}}
+
+{{range .Posts}}
 
 	{{.ID}}
 	{{.Board}}
@@ -19,6 +27,6 @@
 	{{.Name}}
 	{{.Email}}
 	{{.Post}}
-	{{.File}}
+	{{.Files}}
 	{{.Created}}
 {{end}}

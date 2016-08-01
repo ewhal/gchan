@@ -3,7 +3,6 @@ package main
 import (
 	"database/sql"
 	"encoding/json"
-	"fmt"
 	"html"
 	"html/template"
 	"log"
@@ -38,15 +37,16 @@ type Board struct {
 }
 
 type Thread struct {
-	ID       int    `json:"id"`
-	Board    string `json:"board"`
-	Title    string `json:"title"`
-	Name     string `json:"name"`
-	Email    string `json:"email"`
-	Usermode string `json:"usermode"`
-	Post     string `json:"post"`
-	Files    string `json:"files"`
-	Created  string `json:"created"`
+	ID        int    `json:"id"`
+	Board     string `json:"board"`
+	Threadnum string `json:"threadnum"`
+	Title     string `json:"title"`
+	Name      string `json:"name"`
+	Email     string `json:"email"`
+	Usermode  string `json:"usermode"`
+	Post      string `json:"post"`
+	Files     string `json:"files"`
+	Created   string `json:"created"`
 }
 
 type Threads struct {
@@ -92,26 +92,28 @@ func boardHandler(w http.ResponseWriter, r *http.Request) {
 	checkErr(err)
 
 	defer db.Close()
-	query, err := db.Query("select title, subtitle, description from boards where board=?", html.EscapeString(board))
+	b := Threads{Boards: []Board{}, Threads: []Thread{}}
+	query, err := db.Query("select board, title, subtitle, description from boards where board=?", html.EscapeString(board))
 	checkErr(err)
 	for query.Next() {
-		var title, subtitle, description string
-		query.Scan(&title, &subtitle, &description)
+		p := Board{}
+		query.Scan(&p.Board, &p.Title, &p.Subtitle, &p.Description)
+		b.Boards = append(b.Boards, p)
 
-		fmt.Printf(board)
-		fmt.Printf(title)
-		fmt.Printf(subtitle)
-		fmt.Printf(description)
 	}
-	stmt, err := db.Query("select * from threads where board=?", html.EscapeString(board))
+	stmt, err := db.Query("select id, board, threadnum, title, name, email, usermode, post, files, created from threads where board=? LIMIT 15", html.EscapeString(board))
 	checkErr(err)
 
-	b := Threads{Threads: []Thread{}}
 	for stmt.Next() {
 		p := Thread{}
-		stmt.Scan(&p.ID, &p.Board, &p.Title, &p.Name, &p.Email, &p.Usermode, &p.Post, &p.Files, &p.Created)
+		stmt.Scan(&p.ID, &p.Board, &p.Threadnum, &p.Title, &p.Name, &p.Email, &p.Usermode, &p.Post, &p.Files, &p.Created)
 		b.Threads = append(b.Threads, p)
 
+	}
+
+	err = templates.ExecuteTemplate(w, "thread.html", &b)
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
 	}
 
 }
