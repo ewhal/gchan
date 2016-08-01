@@ -1,12 +1,16 @@
 package main
 
 import (
+	"database/sql"
 	"encoding/json"
+	"fmt"
 	"log"
 	"net/http"
 	"os"
 
 	"github.com/gorilla/mux"
+	// mysql driver
+	_ "github.com/go-sql-driver/mysql"
 )
 
 var DATABASE string
@@ -23,18 +27,36 @@ type Configuration struct {
 	Name string
 }
 
+// checkErr function for error handling
+func checkErr(err error) {
+	if err != nil {
+		log.Println(err.Error())
+	}
+}
+
 func rootHandler(w http.ResponseWriter, r *http.Request) {
-	vars := mux.Vars(r)
-	appnumber := vars["appnumber"]
+	// open db connection
+	db, err := sql.Open("mysql", DATABASE)
+	checkErr(err)
+
+	defer db.Close()
+	query, err := db.Query("select board from boards")
+	for query.Next() {
+		var title string
+		query.Scan(&title)
+		fmt.Printf(title)
+
+	}
+
 }
 func boardHandler(w http.ResponseWriter, r *http.Request) {
-	vars := mux.Vars(r)
-	appnumber := vars["appnumber"]
+	//vars := mux.Vars(r)
+	//appnumber := vars["appnumber"]
 }
 
 func threadHandler(w http.ResponseWriter, r *http.Request) {
-	vars := mux.Vars(r)
-	appnumber := vars["appnumber"]
+	//vars := mux.Vars(r)
+	//appnumber := vars["appnumber"]
 }
 
 func newHandler(w http.ResponseWriter, r *http.Request) {
@@ -62,7 +84,7 @@ func main() {
 	router.HandleFunc("/{BOARD}/thread/{ID}", rootHandler)
 	router.HandleFunc("/thread/{ID}", threadHandler)
 	router.HandleFunc("/{BOARD}/page/{ID}", boardHandler)
-	router.HandleFunc("/img/{ID}", tHandler)
+	router.HandleFunc("/img/{ID}", threadHandler)
 	router.HandleFunc("/new", newHandler)
 	// ListenAndServe on PORT with router
 	err = http.ListenAndServe(configuration.Port, router)

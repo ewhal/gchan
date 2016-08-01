@@ -1,5 +1,6 @@
-CREATE TABLE `board` (
+CREATE TABLE `boards` (
   `id` int(10) unsigned NOT NULL auto_increment,
+  `board` longtext,
   `title` longtext,
   `subtitle` longtext,
   `description` longtext,
@@ -15,7 +16,7 @@ CREATE TABLE `threads` (
   `usermode` longtext,
   `post` longtext,
   `files` longtext,
-  `created` DATESTAMP,
+  `created` TIMESTAMP,
   PRIMARY KEY (`id`)
 );
 
@@ -28,7 +29,7 @@ CREATE TABLE `posts` (
   `usermode` longtext,
   `post` longtext,
   `files` longtext,
-  `created` DATESTAMP,
+  `created` TIMESTAMP,
   PRIMARY KEY (`id`)
 );
 
