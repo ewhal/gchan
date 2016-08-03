@@ -185,6 +185,15 @@ func threadHandler(w http.ResponseWriter, r *http.Request) {
 func newHandler(w http.ResponseWriter, r *http.Request) {
 
 }
+func logoutHandler(w http.ResponseWriter, r *http.Request) {
+
+}
+func registerHandler(w http.ResponseWriter, r *http.Request) {
+
+}
+func loginHandler(w http.ResponseWriter, r *http.Request) {
+
+}
 
 func main() {
 	file, err := os.Open("config.json")
@@ -206,12 +215,13 @@ func main() {
 	router.HandleFunc("/{BOARD}", boardHandler)
 	router.HandleFunc("/{BOARD}/", boardHandler)
 	router.HandleFunc("/{BOARD}/thread/{ID}", threadHandler)
-	//	router.HandleFunc("/{BOARD}/page/{ID}", boardHandler)
+	router.HandleFunc("/{BOARD}/page/{ID}", boardHandler)
 	router.HandleFunc("/img/{ID}", threadHandler)
 	router.HandleFunc("/new", newHandler)
-	//	router.HandleFunc("/mod", modHandler)
-	//	router.HandleFunc("/login", loginHandler)
-	//	router.HandleFunc("/register", registerHandler)
+	router.HandleFunc("/mod", modHandler)
+	router.HandleFunc("/login", loginHandler)
+	router.HandleFunc("/register", registerHandler)
+	router.HandleFunc("/logout", logoutHandler)
 
 	// ListenAndServe on PORT with router
 	err = http.ListenAndServe(configuration.Port, router)
