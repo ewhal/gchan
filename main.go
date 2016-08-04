@@ -183,6 +183,27 @@ func threadHandler(w http.ResponseWriter, r *http.Request) {
 }
 
 func newHandler(w http.ResponseWriter, r *http.Request) {
+	vars := mux.Vars(r)
+	board := vars["BOARD"]
+
+	db, err := sql.Open("mysql", DATABASE)
+	checkErr(err)
+
+	defer db.Close()
+
+	name := r.FormValue("name")
+	email := r.FormValue("email")
+	post := r.FormValue("post")
+	usermode := r.FormValue("usermode")
+	file, handler, err := r.FormFile("file")
+	checkErr(err)
+
+	query, err := db.Prepare("insert into threads(name, email, post, thread, usermode, file) values(?, ?, ?, ?, ?)")
+	checkErr(err)
+
+	_, err = query.Exec(html.EscapeString(name), html.EscapeString(email), html.EscapeString(post), html.EscapeString(usermode), html.EscapeString(file))
+	checkErr(err)
+	http.Redirect(w, r, "/"+id, 302)
 
 }
 func logoutHandler(w http.ResponseWriter, r *http.Request) {
@@ -217,7 +238,7 @@ func main() {
 	router.HandleFunc("/{BOARD}/thread/{ID}", threadHandler)
 	router.HandleFunc("/{BOARD}/page/{ID}", boardHandler)
 	router.HandleFunc("/img/{ID}", threadHandler)
-	router.HandleFunc("/new", newHandler)
+	router.HandleFunc("/{BOARD}/new", newHandler)
 	router.HandleFunc("/mod", modHandler)
 	router.HandleFunc("/login", loginHandler)
 	router.HandleFunc("/register", registerHandler)
