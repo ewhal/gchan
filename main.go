@@ -30,7 +30,8 @@ type Configuration struct {
 	// PASS database password
 	Password string
 	// NAME database name
-	Name string
+	Name           string
+	UploadLocation string
 }
 
 type Board struct {
@@ -226,6 +227,9 @@ func registerHandler(w http.ResponseWriter, r *http.Request) {
 
 }
 func loginHandler(w http.ResponseWriter, r *http.Request) {
+
+}
+func modHandler(w http.ResponseWriter, r *http.Request) {
 
 }
 
