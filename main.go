@@ -208,15 +208,15 @@ func newHandler(w http.ResponseWriter, r *http.Request) {
 	// create new filename with random name and extension
 	filename := string(crutime) + extName
 	// create a new file ready for user to upload to
-	f, err := os.OpenFile(config.UploadLocation+filename, os.O_WRONLY|os.O_CREATE, 0666)
+	f, err := os.OpenFile(configuration.UploadLocation+filename, os.O_WRONLY|os.O_CREATE, 0666)
 	checkErr(err)
 	defer f.Close()
 	io.Copy(f, file)
 
-	query, err := db.Prepare("insert into threads(name, email, post, thread, usermode, file) values(?, ?, ?, ?, ?)")
+	query, err := db.Prepare("insert into threads(board, thread, name, email, post, thread, usermode, file) values(?, ?, ?, ?, ?, ?, ?)")
 	checkErr(err)
 
-	_, err = query.Exec(html.EscapeString(name), html.EscapeString(email), html.EscapeString(post), html.EscapeString(usermode), html.EscapeString(filename))
+	_, err = query.Exec(html.EscapeString(board), time.Now().Unix(), html.EscapeString(name), html.EscapeString(email), html.EscapeString(post), html.EscapeString(usermode), html.EscapeString(filename))
 	checkErr(err)
 
 }
