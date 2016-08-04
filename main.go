@@ -6,9 +6,12 @@ import (
 	"fmt"
 	"html"
 	"html/template"
+	"io"
 	"log"
 	"net/http"
 	"os"
+	"path/filepath"
+	"time"
 
 	"github.com/gorilla/mux"
 	// mysql driver
@@ -195,15 +198,25 @@ func newHandler(w http.ResponseWriter, r *http.Request) {
 	email := r.FormValue("email")
 	post := r.FormValue("post")
 	usermode := r.FormValue("usermode")
+	r.ParseMultipartForm(32 << 20)
 	file, handler, err := r.FormFile("file")
 	checkErr(err)
+	defer file.Close()
+	crutime := time.Now().Unix()
+	extName := filepath.Ext(handler.Filename)
+	// create new filename with random name and extension
+	filename := string(crutime) + extName
+	// create a new file ready for user to upload to
+	f, err := os.OpenFile(config.UploadLocation+filename, os.O_WRONLY|os.O_CREATE, 0666)
+	checkErr(err)
+	defer f.Close()
+	io.Copy(f, file)
 
 	query, err := db.Prepare("insert into threads(name, email, post, thread, usermode, file) values(?, ?, ?, ?, ?)")
 	checkErr(err)
 
-	_, err = query.Exec(html.EscapeString(name), html.EscapeString(email), html.EscapeString(post), html.EscapeString(usermode), html.EscapeString(file))
+	_, err = query.Exec(html.EscapeString(name), html.EscapeString(email), html.EscapeString(post), html.EscapeString(usermode), html.EscapeString(filename))
 	checkErr(err)
-	http.Redirect(w, r, "/"+id, 302)
 
 }
 func logoutHandler(w http.ResponseWriter, r *http.Request) {
