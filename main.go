@@ -115,7 +115,7 @@ func boardHandler(w http.ResponseWriter, r *http.Request) {
 		b.Boards = append(b.Boards, p)
 
 	}
-	stmt, err := db.Query("select id, board, threadnum, title, name, email, usermode, post, files, created from posts where board=? and op=1 LIMIT 15", html.EscapeString(board))
+	stmt, err := db.Query("select id, board, postnum, title, name, email, usermode, post, files, created from posts where board=? and op=1 LIMIT 15", html.EscapeString(board))
 	checkErr(err)
 
 	for stmt.Next() {
@@ -141,7 +141,7 @@ func threadHandler(w http.ResponseWriter, r *http.Request) {
 	checkErr(err)
 
 	defer db.Close()
-	b := Posts{Boards: []Board{}, Threads: []Thread{}, Posts: []Post{}}
+	b := Posts{Boards: []Board{}, Posts: []Post{}}
 	query, err := db.Query("select board, title, subtitle, description from boards where board=?", html.EscapeString(board))
 	checkErr(err)
 	for query.Next() {
@@ -150,13 +150,13 @@ func threadHandler(w http.ResponseWriter, r *http.Request) {
 		b.Boards = append(b.Boards, p)
 
 	}
-	stmt, err := db.Query("select id, board, threadnum, title, name, email, usermode, post, files, created from threads where board=? LIMIT 1", html.EscapeString(board))
+	stmt, err := db.Query("select id, board, postnum, title, name, email, usermode, post, files, created from posts where board=? and op=0 LIMIT 1", html.EscapeString(board))
 	checkErr(err)
 
 	for stmt.Next() {
-		p := Thread{}
-		stmt.Scan(&p.ID, &p.Board, &p.Threadnum, &p.Title, &p.Name, &p.Email, &p.Usermode, &p.Post, &p.Files, &p.Created)
-		b.Threads = append(b.Threads, p)
+		p := Post{}
+		stmt.Scan(&p.ID, &p.Board, &p.Postnum, &p.Title, &p.Name, &p.Email, &p.Usermode, &p.Post, &p.Files, &p.Created)
+		b.Posts = append(b.Posts, p)
 
 	}
 	sm, err := db.Query("select id, board, postnum, thread, title, name, email, usermode, post, files, created from posts where board=? and thread=?", html.EscapeString(board), html.EscapeString(thread))
@@ -201,10 +201,10 @@ func newHandler(w http.ResponseWriter, r *http.Request) {
 	defer f.Close()
 	io.Copy(f, file)
 
-	query, err := db.Prepare("insert into threads(board, name, email, post,  usermode, file) values(?, ?, ?, ?, ?, ?)")
+	query, err := db.Prepare("insert into posts(board, name, email, post,  usermode, files, op) values(?, ?, ?, ?, ?, ?, ?)")
 	checkErr(err)
 
-	_, err = query.Exec(html.EscapeString(board), html.EscapeString(name), html.EscapeString(email), html.EscapeString(post), html.EscapeString(usermode), html.EscapeString(filename))
+	_, err = query.Exec(html.EscapeString(board), html.EscapeString(name), html.EscapeString(email), html.EscapeString(post), html.EscapeString(usermode), html.EscapeString(filename), 1)
 	checkErr(err)
 
 }
