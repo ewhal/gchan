@@ -40,7 +40,6 @@
 						<ul class="nav navbar-nav">
 						{{ range .Boards}}
 							<li><a href="/{{.Board}}/">/{{.Board}}/</a></li>
-							{{.Description}}
 						{{end}}
 
 						</ul>
@@ -50,17 +49,15 @@
 		</div>
 		<div class="container">
 
-			{{ range .Board}}
-				<li><a href="/{{.Board}}/">/{{.Board}}/</a></li>
-				{{.Title}}
-				{{.Subtitle}}
-				{{.Description}}
-			{{end}}
+				<li><a href="/{{.Board.Board}}/">/{{.Board.Board}}/</a></li>
+				{{.Board.Title}}
+				{{.Board.Subtitle}}
+				{{.Board.Description}}
 
 			<div class="well bs-component">
-				<form class="form-horizontal" action="/{{.Board}}/new/" method="POST">
+				<form class="form-horizontal" action="/{{.Board.Board}}/new" method="POST" enctype="multipart/form-data">
 					<fieldset>
-						<legend>Login</legend>
+						<legend>New Thread</legend>
 						<div class="form-group is-empty">
 							<label for="inputTitle" class="col-md-2 control-label">Title</label>
 
@@ -95,7 +92,7 @@
 
 							<div class="col-md-10">
 								<input type="text" readonly="" class="form-control" placeholder="Browse...">
-								<input type="file" id="inputFile" name="files[]">
+								<input type="file" id="inputFile" name="files">
 							</div>
 						</div>
 

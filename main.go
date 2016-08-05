@@ -116,8 +116,14 @@ func boardHandler(w http.ResponseWriter, r *http.Request) {
 	checkErr(err)
 
 	defer db.Close()
-	b := Posts{Boards: []Board{}, Threads: []Thread{}, Posts: []Post{}}
+	b := Posts{Board: Board{}, Boards: []Board{}, Threads: []Thread{}, Posts: []Post{}}
 	query, err := db.Query("select board, title, subtitle, description from boards where board=?", html.EscapeString(board))
+	checkErr(err)
+	for query.Next() {
+		query.Scan(&b.Board.Board, &b.Board.Title, &b.Board.Subtitle, &b.Board.Description)
+
+	}
+	query, err = db.Query("select board from boards")
 	checkErr(err)
 	for query.Next() {
 		p := Board{}
@@ -198,7 +204,7 @@ func newHandler(w http.ResponseWriter, r *http.Request) {
 	post := r.FormValue("post")
 	usermode := r.FormValue("usermode")
 	r.ParseMultipartForm(32 << 20)
-	file, handler, err := r.FormFile("file")
+	file, handler, err := r.FormFile("files")
 	checkErr(err)
 	defer file.Close()
 	crutime := time.Now().Unix()
@@ -253,7 +259,7 @@ func main() {
 	router.HandleFunc("/{BOARD}/thread/{ID}", threadHandler)
 	router.HandleFunc("/{BOARD}/page/{ID}", boardHandler)
 	router.HandleFunc("/img/{ID}", threadHandler)
-	router.HandleFunc("/{BOARD}/new", newHandler)
+	router.HandleFunc("/{BOARD}/new", newHandler).Methods("POST")
 	router.HandleFunc("/mod", modHandler)
 	router.HandleFunc("/login", loginHandler)
 	router.HandleFunc("/register", registerHandler)
