@@ -40,6 +40,7 @@
 						<ul class="nav navbar-nav">
 						{{ range .Boards}}
 							<li><a href="/{{.Board}}/">/{{.Board}}/</a></li>
+							{{.Description}}
 						{{end}}
 
 						</ul>
@@ -49,13 +50,64 @@
 		</div>
 		<div class="container">
 
-			{{ range .Boards}}
+			{{ range .Board}}
 				<li><a href="/{{.Board}}/">/{{.Board}}/</a></li>
 				{{.Title}}
 				{{.Subtitle}}
 				{{.Description}}
 			{{end}}
 
+			<div class="well bs-component">
+				<form class="form-horizontal" action="/{{.Board}}/new/" method="POST">
+					<fieldset>
+						<legend>Login</legend>
+						<div class="form-group is-empty">
+							<label for="inputTitle" class="col-md-2 control-label">Title</label>
+
+							<div class="col-md-10">
+								<input type="text" class="form-control" id="inputTitle" placeholder="Title" name="title">
+							</div>
+						</div>
+						<div class="form-group is-empty">
+							<label for="inputEmail" class="col-md-2 control-label">Email</label>
+
+							<div class="col-md-10">
+								<input type="email" class="form-control" id="inputEmail" placeholder="Email" required name="email">
+							</div>
+						</div>
+
+						<div class="form-group is-empty">
+							<label for="inputMode" class="col-md-2 control-label">Mode</label>
+
+							<div class="col-md-10">
+								<input type="text" class="form-control" id="inputMode" placeholder="Mode" name="usermode">
+							</div>
+						</div>
+						<div class="form-group is-empty">
+							<label for="inputPost" class="col-md-2 control-label">Post</label>
+
+							<div class="col-md-10">
+								<input type="textarea" class="form-control" id="inputPost" placeholder="Post" name="post">
+							</div>
+						</div>
+						<div class="form-group is-empty is-fileinput">
+							<label for="inputFile" class="col-md-2 control-label">Files</label>
+
+							<div class="col-md-10">
+								<input type="text" readonly="" class="form-control" placeholder="Browse...">
+								<input type="file" id="inputFile" name="files[]">
+							</div>
+						</div>
+
+
+						<div class="form-group">
+							<div class="col-md-10 pull-right">
+								<button type="submit" class="btn btn-raised btn-primary">Submit<div class="ripple-container"></div></button>
+							</div>
+						</div>
+					</fieldset>
+				</form>
+			</div>
 
 			{{range .Threads}}
 
