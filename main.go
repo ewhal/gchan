@@ -40,22 +40,11 @@ type Board struct {
 	Description string `json:"description"`
 }
 
-type Thread struct {
-	ID        int    `json:"id"`
-	Board     string `json:"board"`
-	Threadnum int    `json:"threadnum"`
-	Title     string `json:"title"`
-	Name      string `json:"name"`
-	Email     string `json:"email"`
-	Usermode  string `json:"usermode"`
-	Post      string `json:"post"`
-	Files     string `json:"files"`
-	Created   string `json:"created"`
-}
 type Post struct {
 	ID       int    `json:"id"`
 	Board    string `json:"board"`
 	Postnum  int    `json:"postnum"`
+	OP       bool   `json:"op"`
 	Thread   int    `json:"thread"`
 	Title    string `json:"title"`
 	Name     string `json:"name"`
@@ -66,16 +55,10 @@ type Post struct {
 	Created  string `json:"created"`
 }
 
-type Threads struct {
-	Boards  []Board  `json:"boards"`
-	Board   Board    `json:"board"`
-	Threads []Thread `json:"threads"`
-}
 type Posts struct {
-	Boards  []Board  `json:"boards"`
-	Board   Board    `json:"board"`
-	Threads []Thread `json:"threads"`
-	Posts   []Post   `json:"posts"`
+	Boards []Board `json:"boards"`
+	Board  Board   `json:"board"`
+	Posts  []Post  `json:"posts"`
 }
 type Boards struct {
 	Boards []Board `json:"boards"`
@@ -108,6 +91,7 @@ func rootHandler(w http.ResponseWriter, r *http.Request) {
 	}
 
 }
+
 func boardHandler(w http.ResponseWriter, r *http.Request) {
 	vars := mux.Vars(r)
 	board := vars["BOARD"]
@@ -116,7 +100,7 @@ func boardHandler(w http.ResponseWriter, r *http.Request) {
 	checkErr(err)
 
 	defer db.Close()
-	b := Posts{Board: Board{}, Boards: []Board{}, Threads: []Thread{}, Posts: []Post{}}
+	b := Posts{Board: Board{}, Boards: []Board{}, Posts: []Post{}}
 	query, err := db.Query("select board, title, subtitle, description from boards where board=?", html.EscapeString(board))
 	checkErr(err)
 	for query.Next() {
@@ -131,13 +115,13 @@ func boardHandler(w http.ResponseWriter, r *http.Request) {
 		b.Boards = append(b.Boards, p)
 
 	}
-	stmt, err := db.Query("select id, board, threadnum, title, name, email, usermode, post, files, created from threads where board=? LIMIT 15", html.EscapeString(board))
+	stmt, err := db.Query("select id, board, threadnum, title, name, email, usermode, post, files, created from posts where board=? and op=1 LIMIT 15", html.EscapeString(board))
 	checkErr(err)
 
 	for stmt.Next() {
-		p := Thread{}
-		stmt.Scan(&p.ID, &p.Board, &p.Threadnum, &p.Title, &p.Name, &p.Email, &p.Usermode, &p.Post, &p.Files, &p.Created)
-		b.Threads = append(b.Threads, p)
+		p := Post{}
+		stmt.Scan(&p.ID, &p.Board, &p.Postnum, &p.Title, &p.Name, &p.Email, &p.Usermode, &p.Post, &p.Files, &p.Created)
+		b.Posts = append(b.Posts, p)
 
 	}
 
@@ -217,10 +201,10 @@ func newHandler(w http.ResponseWriter, r *http.Request) {
 	defer f.Close()
 	io.Copy(f, file)
 
-	query, err := db.Prepare("insert into threads(board, thread, name, email, post, thread, usermode, file) values(?, ?, ?, ?, ?, ?, ?)")
+	query, err := db.Prepare("insert into threads(board, name, email, post,  usermode, file) values(?, ?, ?, ?, ?, ?)")
 	checkErr(err)
 
-	_, err = query.Exec(html.EscapeString(board), time.Now().Unix(), html.EscapeString(name), html.EscapeString(email), html.EscapeString(post), html.EscapeString(usermode), html.EscapeString(filename))
+	_, err = query.Exec(html.EscapeString(board), html.EscapeString(name), html.EscapeString(email), html.EscapeString(post), html.EscapeString(usermode), html.EscapeString(filename))
 	checkErr(err)
 
 }
