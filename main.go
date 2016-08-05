@@ -3,7 +3,6 @@ package main
 import (
 	"database/sql"
 	"encoding/json"
-	"fmt"
 	"html"
 	"html/template"
 	"io"
@@ -171,7 +170,6 @@ func threadHandler(w http.ResponseWriter, r *http.Request) {
 
 	}
 	sm, err := db.Query("select id, board, postnum, thread, title, name, email, usermode, post, files, created from posts where board=? and thread=?", html.EscapeString(board), html.EscapeString(thread))
-	fmt.Println(thread)
 	checkErr(err)
 
 	for sm.Next() {
