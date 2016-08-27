@@ -10,7 +10,7 @@ Many implementations of imageboard software do exist but the most popular imageb
 * go
 * mariadb
 
-
+```
 sudo yum install -y go mariadb-server mariadb
 ```
 
