@@ -6,8 +6,6 @@ go:
   - 1.5.3
 
 install:
-  - go get github.com/dchest/uniuri
-  - go get github.com/ewhal/pygments
   - go get github.com/go-sql-driver/mysql
   - go get github.com/gorilla/mux
 script:
