@@ -2,6 +2,8 @@ language: go
 
 go:
   - tip
+  - 1.7
+  - 1.5.3
 
 install:
   - go get github.com/dchest/uniuri
