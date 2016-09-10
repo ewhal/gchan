@@ -22,6 +22,34 @@ sudo yum install -y go mariadb-server mariadb
 * nano config.json
 * Configure port and database details
 
+## Todo
+[] Posts
+  [] Tripcode
+  [] capcode
+  [] green text
+  [] red text
+  [] backlinks
+  
+[] Frontend
+  [] thumbnails
+  [] Image uploading
+  [] webm and mp4
+  
+[] Javascript
+  [] auto thread refresh
+  [] captcha
+
+[] Moderation tools
+  [] board creation
+  [] Admin panel
+  [] sticky thread
+  [] delete thread
+  [] ban and unban
+  
+[] Documentation
+  [] api
+  [] comment code
+  
 ## License
 
 This project is licensed under the MIT License - see the [LICENSE.md](LICENSE.md) file for details
