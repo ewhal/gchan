@@ -23,32 +23,33 @@ sudo yum install -y go mariadb-server mariadb
 * Configure port and database details
 
 ## Todo
-[] Posts
-  [] Tripcode
-  [] capcode
-  [] green text
-  [] red text
-  [] backlinks
+- [ ] Posts
+  - [ ] Tripcode
+  - [ ] capcode
+  - [ ] green text
+  - [ ] red text
+  - [ ] backlinks
   
-[] Frontend
-  [] thumbnails
-  [] Image uploading
-  [] webm and mp4
+- [ ] Frontend
+  - [ ] thumbnails
+  - [ ] Image uploading
+  - [ ] webm and mp4
+  - [ ] Alternative styles
   
-[] Javascript
-  [] auto thread refresh
-  [] captcha
+- [ ] Javascript
+  - [ ] auto thread refresh
+  - [ ] captcha
 
-[] Moderation tools
-  [] board creation
-  [] Admin panel
-  [] sticky thread
-  [] delete thread
-  [] ban and unban
+- [ ] Moderation tools
+  - [ ] board creation
+  - [ ] Admin panel
+  - [ ] sticky thread
+  - [ ] delete thread
+  - [ ] ban and unban
   
-[] Documentation
-  [] api
-  [] comment code
+- [ ] Documentation
+  - [ ] api
+  - [ ] comment code
   
 ## License
 
