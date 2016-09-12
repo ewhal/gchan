@@ -39,6 +39,7 @@ sudo yum install -y go mariadb-server mariadb
 - [ ] Javascript
   - [ ] auto thread refresh
   - [ ] captcha
+  - [ ] thumbnail expansion
 
 - [ ] Moderation tools
   - [ ] board creation
@@ -46,6 +47,7 @@ sudo yum install -y go mariadb-server mariadb
   - [ ] sticky thread
   - [ ] delete thread
   - [ ] ban and unban
+  - [ ] ban appeals
   
 - [ ] Documentation
   - [ ] api
