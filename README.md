@@ -1,4 +1,4 @@
-#Golang Imageboard
+#Golang Imageboard - WIP 
 [![Build Status](https://travis-ci.org/ewhal/gchan.svg?branch=master)](https://travis-ci.org/ewhal/gchan) [![GoDoc](https://godoc.org/github.com/ewhal/gchan?status.svg)](https://godoc.org/github.com/ewhal/gchan) [![Go Report Card](https://goreportcard.com/badge/github.com/ewhal/gchan)](https://goreportcard.com/report/github.com/ewhal/gchan) [![MIT
 licensed](https://img.shields.io/badge/license-MIT-blue.svg)](https://raw.githubusercontent.com/ewhal/gchan/master/LICENSE.md)
 
